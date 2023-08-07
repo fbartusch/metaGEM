@@ -114,7 +114,8 @@ echo -ne "Searching for metaGEM conda environment ... "
 envcheck1=$(conda info --envs|grep -w metagem|wc -l)
 if [[ "$envcheck1" -ge 1 ]]; then
     echo "detected! Activating metagem env ... "
-    conda activate metagem
+    source ~/miniconda3/etc/profile.d/conda.sh
+    conda activate envs/metagem
 else
     echo "not detected, please run the env_setup.sh script!"
 fi
@@ -311,7 +312,8 @@ snakePrep() {
     snakemake --unlock -j 1
 
     echo -e "\nDry-running snakemake jobs ... "
-    snakemake all -j $njobs -n -k --cluster-config ../config/cluster_config.json -c "sbatch -A {cluster.account} -t {cluster.time} -n {cluster.n} --ntasks {cluster.tasks} --cpus-per-task {cluster.n} --output {cluster.output}"
+    #snakemake all -j $njobs -n -k --cluster-config ../config/cluster_config.json -c "sbatch -A {cluster.account} -t {cluster.time} -n {cluster.n} --ntasks {cluster.tasks} --cpus-per-task {cluster.n} --output {cluster.output}"
+    snakemake all -j $njobs -n -k --cluster-config ../config/cluster_config.json -c "qsub -q {cluster.queue} -l walltime={cluster.time} -l nodes=1:ppn={cluster.n} -l mem={cluster.mem} -j oe -o {cluster.output}"
 }
 
 # Submit login node function, note that is only works for rules with no wildcard expansion
@@ -407,7 +409,9 @@ submitCluster() {
 
         # Parse cluster_config.json time (line 4) to match number requested hours stored in "$hours". Note: Hardcoded line number.
         echo "Parsing cluster_config.json to match requested time (hours): $hours ... "
-        sed -i "4s/:.*$/: \"0-$hours:00:00\",/" ../config/cluster_config.json
+        #sed -i "4s/:.*$/: \"0-$hours:00:00\",/" ../config/cluster_config.json
+        #Moab uses another format
+        sed -i "4s/:.*$/: \"$hours:00:00\",/" ../config/cluster_config.json
 
     fi 
 
@@ -424,7 +428,9 @@ submitCluster() {
         while true; do
             read -p "Do you wish to submit this batch of $task jobs? (y/n)" yn
             case $yn in
-                [Yy]* ) echo "nohup snakemake all -j $njobs -k --cluster-config ../config/cluster_config.json -c 'sbatch -A {cluster.account} -t {cluster.time} -n {cluster.n} --ntasks {cluster.tasks} --cpus-per-task {cluster.n} --output {cluster.output}' &"|bash; break;;
+#                [Yy]* ) echo "nohup snakemake all -j $njobs -k --cluster-config ../config/cluster_config.json -c 'sbatch -A {cluster.account} -t {cluster.time} -n {cluster.n} --ntasks {cluster.tasks} --cpus-per-task {cluster.n} --output {cluster.output}' &"|bash; break;;
+                [Yy]* ) echo "nohup snakemake all -j $njobs -k --cluster-config ../config/cluster_config.json -c 'qsub -q {cluster.queue} -l walltime={cluster.time} -l nodes=1:ppn={cluster.n} -j oe -o {cluster.output}' &"|bash; break;;
+
                 [Nn]* ) exit;;
                 * ) echo "Please answer yes or no.";;
             esac
@@ -443,7 +449,8 @@ submitCluster() {
         while true; do
             read -p "Do you wish to submit this batch of jobs? (y/n)" yn
             case $yn in
-                [Yy]* ) echo "nohup snakemake all -j $njobs -k --cluster-config ../config/cluster_config.json -c 'sbatch -A {cluster.account} -t {cluster.time} --mem {cluster.mem} -n {cluster.n} --ntasks {cluster.tasks} --cpus-per-task {cluster.n} --output {cluster.output}' &"|bash; break;;
+#                [Yy]* ) echo "nohup snakemake all -j $njobs -k --cluster-config ../config/cluster_config.json -c 'sbatch -A {cluster.account} -t {cluster.time} --mem {cluster.mem} -n {cluster.n} --ntasks {cluster.tasks} --cpus-per-task {cluster.n} --output {cluster.output}' &"|bash; break;;
+                [Yy]* ) echo "nohup snakemake all -j $njobs -k --cluster-config ../config/cluster_config.json -c 'qsub -q {cluster.queue} -l walltime={cluster.time} -l nodes=1:ppn={cluster.n} -l mem={cluster.mem} -j oe -o {cluster.output}' &"|bash; break;;
                 [Nn]* ) exit;;
                 * ) echo "Please answer yes or no.";;
             esac

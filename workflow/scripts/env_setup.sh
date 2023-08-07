@@ -58,16 +58,16 @@ conda activate mamba && echo "activated mamba environment!"
 while true; do
     read -p "Do you wish to download and set up metaGEM conda environment? (y/n)" yn
     case $yn in
-        [Yy]* ) echo "mamba env create --prefix ./envs/metagem -f envs/metaGEM_env.yml && source activate envs/metagem && pip install --user memote carveme smetana &&  echo "|bash; break;;
+        [Yy]* ) echo "mamba env create --prefix ./envs/metagem -f envs/metaGEM_env.yml && conda activate envs/metagem && pip install --user memote carveme smetana &&  echo "|bash; break;;
         [Nn]* ) echo -e "\nSkipping metaGEM env setup, note that you will need this for refinement & reassembly of MAGs.\n"; break;;
         * ) echo "Please answer yes or no.";;
     esac
 done
-
+conda activate envs/metagem
 while true; do
     read -p "Do you wish to download the GTDB-tk database (~25 Gb)? (y/n)" yn
     case $yn in
-        [Yy]* ) echo "download-db.sh && source deactivate && source activate mamba"|bash; break;;
+        [Yy]* ) echo "download-db.sh && conda deactivate && conda activate mamba"|bash; break;;
         [Nn]* ) echo -e "\nSkipping GTDB-tk database download, note that you will need this for taxonomic classification of MAGs.\n"; break;;
         * ) echo "Please answer yes or no.";;
     esac

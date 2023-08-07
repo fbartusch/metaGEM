@@ -1,6 +1,6 @@
 path:
     root: /path/to/project/folder/on/your/cluster
-    scratch: /path/to/temporary/or/scratch/directory/for/intermediate/files
+    scratch: $TMPDIR
 folder:
     data: dataset
     logs: logs

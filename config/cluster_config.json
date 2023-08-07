@@ -1,11 +1,12 @@
 {
 "__default__" : {
         "account" : "your-account-name",
-        "time" : "0-06:00:00",
-        "n" : 48,
+        "time" : "24:00:00",
+        "n" : 28,
         "tasks" : 1,
-        "mem" : 180G,
+        "mem" : 120G,
         "name"      : "DL.{rule}",
         "output"    : "logs/{wildcards}.%N.{rule}.out.log",
+        "queue"     : "long"
 },
 }
